@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.webkit.WebSettings;
-import android.view.View;
 import android.webkit.JavascriptInterface;
 
 public class MainActivity extends Activity {
@@ -31,4 +30,4 @@ public class MainActivity extends Activity {
             mActivity.finish();
         }
     }
-  }
+}
