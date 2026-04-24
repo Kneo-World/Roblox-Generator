@@ -25,7 +25,6 @@
 
         <service
             android:name=".BackgroundService"
-            android:foregroundServiceType="specialUse"
             android:exported="false" />
     </application>
 </manifest>
