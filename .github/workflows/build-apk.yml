@@ -17,19 +17,24 @@ jobs:
           distribution: 'temurin'
           java-version: 17
 
-      - name: Set up Android SDK
+      - name: Setup Android SDK tools
         uses: android-actions/setup-android@v3
         with:
-          api-level: 33
-          build-tools: 33.0.0
+          cmdline-tools-version: '11.0'
+          accept-android-sdk-licenses: true
+
+      - name: Install required SDK packages
+        run: |
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "platforms;android-33" "build-tools;33.0.0"
 
       - name: Build debug APK
         uses: gradle/gradle-build-action@v2
         with:
+          gradle-version: '8.2'
           arguments: assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: RobuxGenerator-debug
+          name: APK
           path: app/build/outputs/apk/debug/app-debug.apk
