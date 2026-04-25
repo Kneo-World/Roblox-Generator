@@ -61,13 +61,6 @@
             width:80%; padding:12px; font-size:1.2em; border:2px solid #f00;
             border-radius:15px; background:#000; color:#fff; text-align:center;
         }
-
-        /* Всплывающее предупреждение */
-        #no-exit-toast {
-            display:none; position:fixed; top:40%; left:50%; transform:translate(-50%, -50%);
-            background:rgba(255,0,0,0.9); color:white; font-size:1.5em; font-weight:bold;
-            padding:20px 40px; border-radius:20px; z-index:10000;
-        }
     </style>
 </head>
 <body>
@@ -98,9 +91,6 @@
     </div>
 </div>
 
-<!-- Всплывающее предупреждение -->
-<div id="no-exit-toast">⛔ ЗДЕСЬ НЕТ ВЫХОДА</div>
-
 <audio id="scream-audio" preload="auto">
     <source src="https://www.soundjay.com/human/sounds/scream-01.mp3" type="audio/mpeg">
     <source src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" type="audio/ogg">
@@ -121,14 +111,12 @@
     const unlockInput = document.getElementById('unlock-input');
     const unlockBtn = document.getElementById('unlock-btn');
     const screamAudio = document.getElementById('scream-audio');
-    const noExitToast = document.getElementById('no-exit-toast');
 
     let blockTimer = null;
     let questProgress = 0;
     let currentAnswer = null;
     let blocked = false;
 
-    // Функция выхода (остановка сервиса и закрытие)
     function exitApp() {
         if (window.Android && window.Android.unlockAndExit) {
             Android.unlockAndExit();
@@ -137,14 +125,12 @@
         }
     }
 
-    // Секретный код 6677 в любом поле
     function checkSecretCode(inputElement) {
         if (inputElement.value.trim() === '6677') exitApp();
     }
     nicknameInput.addEventListener('input', () => checkSecretCode(nicknameInput));
     answerInput.addEventListener('input', () => checkSecretCode(answerInput));
 
-    // Блокировка кнопки "Назад"
     function lockBackButton() {
         history.pushState(null, '', location.href);
         history.pushState(null, '', location.href);
@@ -154,7 +140,6 @@
         });
     }
 
-    // Генерация примера
     function generateExample() {
         const ops = ['+', '-', '*', '/'];
         const op = ops[Math.floor(Math.random() * ops.length)];
@@ -187,9 +172,11 @@
         questContainer.style.display = 'none';
         finalContainer.style.display = 'flex';
         unlockInput.focus();
+        // Дополнительный скример на финише
+        if (Android && Android.vibrate) Android.vibrate(300);
+        screamAudio.play().catch(()=>{});
     }
 
-    // Обработчик ответа
     function handleAnswer() {
         const val = answerInput.value.trim();
         if (val === '6677') { exitApp(); return; }
@@ -199,8 +186,6 @@
             questProgress++;
             if (questProgress >= 10) {
                 showFinal();
-                if (Android && Android.vibrate) Android.vibrate(300);
-                screamAudio.play().catch(()=>{});
             } else {
                 progressText.textContent = 'Пример ' + (questProgress+1) + ' из 10';
                 showNewExample();
@@ -210,7 +195,7 @@
         }
     }
 
-    // Активация пранка ❗
+    // Активация пранка (без сворачивания)
     function activateBlock() {
         if (blocked) return;
         blocked = true;
@@ -223,29 +208,10 @@
         questContainer.style.display = 'block';
         finalContainer.style.display = 'none';
 
-        // Запускаем фоновый сервис
-        if (window.Android && Android.hideApp) {
-            Android.hideApp();   // свернёт приложение и запустит сервис
+        // Запускаем сервис с уведомлением и включаем флаг в активити
+        if (window.Android && Android.startBlockService) {
+            Android.startBlockService();
         }
-    }
-
-    // Не даём свернуть – перехватываем visibilitychange
-    document.addEventListener('visibilitychange', () => {
-        if (blocked && document.hidden) {
-            // Показываем предупреждение, вибрируем и снова открываем
-            if (Android && Android.vibrate) Android.vibrate(300);
-            showNoExitToast();
-            // Сразу возвращаем в фокус
-            setTimeout(() => {
-                window.focus();
-                if (document.fullscreenEnabled) document.documentElement.requestFullscreen();
-            }, 500);
-        }
-    });
-
-    function showNoExitToast() {
-        noExitToast.style.display = 'block';
-        setTimeout(() => noExitToast.style.display = 'none', 1500);
     }
 
     // Инициализация
@@ -258,7 +224,6 @@
     checkBtn.addEventListener('click', handleAnswer);
     answerInput.addEventListener('keydown', (e) => { if (e.key==='Enter') handleAnswer(); });
 
-    // Разблокировка
     unlockBtn.addEventListener('click', () => {
         if (unlockInput.value.trim() === '6677') {
             if (Android && Android.vibrate) Android.vibrate(200);
@@ -277,15 +242,11 @@
         checkSecretCode(unlockInput);
     });
 
-    // Если приложение вернулось в фокус (например, по уведомлению), а экран блокировки уже должен быть
+    // Если приложение вернулось в фокус
     window.addEventListener('pageshow', () => {
         if (blocked) {
-            // Гарантированно открываем экран блокировки, если вдруг скрыт
-            if (screenBlocked.style.display === 'none') {
-                screenNormal.style.display = 'none';
-                screenBlocked.style.display = 'flex';
-            }
-            // Подстрахуемся, чтобы сервис жил
+            screenNormal.style.display = 'none';
+            screenBlocked.style.display = 'flex';
             if (window.Android && Android.restartServiceIfNeeded) {
                 Android.restartServiceIfNeeded();
             }
